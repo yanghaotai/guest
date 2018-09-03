@@ -91,6 +91,8 @@ DATABASES = {
         'USER':'root',
         'PASSWORD':'123456',
         'OPTIONS':{
+            'isolation_level': None,
+            'autocommit': True,
             'init_command':"SET sql_mode='STRICT_TRANS_TABLES'",
         },
     }

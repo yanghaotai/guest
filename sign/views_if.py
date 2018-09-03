@@ -12,6 +12,12 @@ def add_event(request):
     status = request.POST.get('status','')    #状态
     address = request.POST.get('address','')  #地址
     start_time = request.POST.get('start_time','')  #发布会时间
+    # print(eid)
+    # print(name)
+    # print(limit)
+    # print(status)
+    # print(address)
+    # print(start_time)
 
     if eid == '' or name == '' or limit == '' or status == '' or address == '' or start_time == '':
         return JsonResponse({'status':10021,'message':'parameter error'})
@@ -77,16 +83,20 @@ def get_event_list(request):
 
 #添加嘉宾接口
 def add_guest(request):
-    eid = request.POST.get('id','')           #关联发布会id
+    eid = request.POST.get('eid','')           #关联发布会id
     realname = request.POST.get('realname','')        #姓名
     phone = request.POST.get('phone','')      #手机号
     email = request.POST.get('email','')    #邮箱
+    print(eid)
+    print(realname)
+    print(phone)
+    print(email)
 
     if eid == '' or realname == '' or phone == '':
         return JsonResponse({'status':10021,'message':'parameter error'})
 
     result = Event.objects.filter(id = eid)
-    if result:
+    if not result:
         return JsonResponse({'status':10022,'message':'event id null'})
 
     result = Event.objects.get(id = eid).status
@@ -100,7 +110,9 @@ def add_guest(request):
         return JsonResponse({'status':10024,'message':'event number is full'})
 
     event_time = Event.objects.get(id = eid).start_time  #发布会时间
-    etime = str(event_time).split(".")[0]
+    print(event_time)
+    etime = str(event_time).split("+")[0]
+    print(etime)
     timeArray = time.strptime(etime,"%Y-%m-%d %H:%M:%S")
     e_time = int(time.mktime(timeArray))
 
@@ -109,7 +121,7 @@ def add_guest(request):
     n_time = int(ntime)
 
     if n_time >= e_time:
-        return JsonResponse({'status': 10025, 'message': 'event has started'})
+        return JsonResponse({'status':10025, 'message': 'event has started'})
 
     try:
         Guest.objects.create(realname=realname,phone=int(phone),email=email,sign=0,event_id=int(eid))
@@ -122,6 +134,7 @@ def add_guest(request):
 def get_guest_list(request):
     eid = request.GET.get('eid','')           #关联发布会id
     phone = request.GET.get('phone','')        #嘉宾手机号
+    print(eid)
 
     if eid == '':
         return JsonResponse({'status':10021,'message':'eid cannot be empty'})
@@ -157,8 +170,11 @@ def get_guest_list(request):
 
 #嘉宾签到接口
 def user_sign(request):
-    eid = request.POST.get('eid','')           #发布会id
-    phone = request.POST.get('phone','')        #嘉宾手机号
+    # eid = request.POST.get('eid','')
+    eid = request.GET.get('eid','')           #发布会id
+    phone = request.GET.get('phone','')        #嘉宾手机号
+    print(eid)
+    print(phone)
 
     if eid == '' or phone == '':
         return JsonResponse({'status':10021,'message':'parameter error'})
@@ -172,7 +188,7 @@ def user_sign(request):
         return JsonResponse({'status':10023, 'message': 'event status is not availabe'})
 
     event_time = Event.objects.get(id = eid).start_time  #发布会时间
-    etime = str(event_time).split(".")[0]
+    etime = str(event_time).split("+")[0]
     timeArray = time.strptime(etime,"%Y-%m-%d %H:%M:%S")
     e_time = int(time.mktime(timeArray))
 
